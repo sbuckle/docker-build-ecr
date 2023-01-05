@@ -22,6 +22,8 @@ spec:
         - mountPath: "/root/.docker"
           name: docker-config
           readOnly: true
+        - mountPath: "/root/.aws"
+          name: aws-creds
     - name: dind
       image: dind
       env:
@@ -46,5 +48,8 @@ spec:
         name: docker-config
     - emptyDir: {}
       name: docker-certs-client
+    - name: aws-creds
+      secret:
+        secretName: aws-creds
 
 
