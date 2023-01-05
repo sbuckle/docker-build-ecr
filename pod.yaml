@@ -1,0 +1,51 @@
+apiVersion: "v1"
+kind: "Pod"
+spec:
+  serviceAccountName: ecr-build
+  containers:
+    - name: docker
+      image: public.ecr.aws/w2o2i5s8/docker-build-agent:latest
+      command:
+        - "cat"
+      tty: true
+      env:
+        - name: DOCKER_CONFIG
+          value: "/root/.docker"
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_CERT_PATH
+          value: "/certs/client"
+        - name: DOCKER_HOST
+          value: "tcp://localhost:2376"
+      volumeMounts:
+        - mountPath: "/certs/client"
+          name: docker-certs-client
+        - mountPath: "/root/.docker"
+          name: docker-config
+          readOnly: true
+    - name: dind
+      image: dind
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: "/certs"
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: "/var/lib/docker"
+          name: dind-storage
+        - mountPath: "/certs/ca"
+          name: docker-certs-ca
+        - mountPath: "/certs/client"
+          name: docker-certs-client
+  volumes:
+    - emptyDir: {}
+      name: docker-certs-ca
+    - emptyDir: {}
+      name: dind-storage
+    - name: docker-config
+      configMap:
+        name: docker-config
+    - emptyDir: {}
+      name: docker-certs-client
+
+
