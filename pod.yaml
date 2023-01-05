@@ -25,7 +25,7 @@ spec:
         - mountPath: "/root/.aws"
           name: aws-creds
     - name: dind
-      image: dind
+      image: docker:dind
       env:
         - name: DOCKER_TLS_CERTDIR
           value: "/certs"
